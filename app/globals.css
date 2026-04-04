@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f8f5;
+  --foreground: #10231a;
+  --card: #ffffff;
+  --card-foreground: #10231a;
+  --muted: #e7efe9;
+  --muted-foreground: #567061;
+  --primary: #0b8f47;
+  --primary-foreground: #f6fff9;
+  --secondary: #0f5f33;
+  --secondary-foreground: #eefcf3;
+  --border: rgba(16, 35, 26, 0.12);
+  --ring: rgba(11, 143, 71, 0.2);
+  --danger: #dc2626;
+  --success: #047857;
+  --success-soft: #dcfce7;
+  --warning-soft: #eef8f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning-soft: var(--warning-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: linear-gradient(180deg, #f7fbf8 0%, #eef5f0 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(11, 143, 71, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 143, 71, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.32), transparent 78%);
+}
+
+a,
+button,
+input,
+textarea {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+::selection {
+  background: rgba(15, 118, 110, 0.18);
+}
