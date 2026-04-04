@@ -28,7 +28,7 @@ export function VerificationResultModal({
       onClose={onClose}
       title="Check Result"
       description="Here is the result of your product check."
-      className="max-w-3xl"
+      className="max-w-4xl"
     >
       {isLoading ? (
         <StatePanel
@@ -88,7 +88,7 @@ export function VerificationResultModal({
         />
       ) : null}
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-5 flex justify-end">
         <Button type="button" variant="secondary" onClick={onClose}>
           Close
         </Button>

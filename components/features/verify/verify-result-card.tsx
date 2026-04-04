@@ -22,29 +22,37 @@ export function VerifyResultCard({
 
   return (
     <Card>
-      <CardContent className="space-y-5">
+      <CardContent className="space-y-5 sm:space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
               Product Details
             </p>
-            <h2 className="mt-2 text-2xl font-semibold">{product.name}</h2>
+            <h2 className="mt-2 text-xl font-semibold sm:text-2xl">{product.name}</h2>
           </div>
           <Badge className="bg-emerald-100 text-emerald-800">Found in NAFDAC Greenbook</Badge>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
           <ResultItem label="NAFDAC No." value={product.nafdacNumber} />
           <ResultItem label="Category" value={product.category} />
           <ResultItem label="Status" value={product.status} />
-          <ResultItem label="Applicant" value={product.applicant} />
+          <ResultItem
+            label="Applicant"
+            value={product.applicant}
+            className="col-span-2 lg:col-span-1"
+          />
           <ResultItem label="Form" value={product.form} />
           <ResultItem label="Route" value={product.route} />
           <ResultItem label="Strength" value={product.strength} />
           <ResultItem label="Pack Size" value={product.packSize} />
           <ResultItem label="Approval Date" value={product.approvalDate} />
           <ResultItem label="Expiry Date" value={product.expiryDate} />
-          <ResultItem label="Ingredient" value={product.ingredientName} />
+          <ResultItem
+            label="Ingredient"
+            value={product.ingredientName}
+            className="col-span-2 lg:col-span-1"
+          />
         </div>
 
         {product.composition ? (
@@ -82,16 +90,18 @@ export function VerifyResultCard({
 function ResultItem({
   label,
   value,
+  className,
 }: {
   label: string;
   value: string | null;
+  className?: string;
 }) {
   return (
-    <div className="rounded-2xl bg-muted px-4 py-3">
+    <div className={["rounded-2xl bg-muted px-3 py-3 sm:px-4", className].filter(Boolean).join(" ")}>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </p>
-      <p className="mt-2 text-sm leading-6">{value || "Not available"}</p>
+      <p className="mt-2 text-sm leading-6 break-words">{value || "Not available"}</p>
     </div>
   );
 }

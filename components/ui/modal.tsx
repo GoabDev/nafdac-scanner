@@ -26,7 +26,7 @@ export function Modal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0b1720]/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#0b1720]/50 p-3 backdrop-blur-sm sm:items-center sm:p-4">
       <button
         type="button"
         className="absolute inset-0 cursor-default"
@@ -35,13 +35,13 @@ export function Modal({
       />
       <div
         className={cn(
-          "relative z-10 w-full max-w-2xl rounded-[32px] border border-white/40 bg-white p-6 shadow-[0_28px_100px_rgba(11,23,32,0.28)] sm:p-8",
+          "relative z-10 flex max-h-[calc(100dvh-1.5rem)] w-full max-w-2xl flex-col overflow-hidden rounded-[28px] border border-white/40 bg-white shadow-[0_28px_100px_rgba(11,23,32,0.28)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[32px]",
           className,
         )}
       >
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-5 sm:px-8 sm:py-6">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
+            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
             {description ? (
               <p className="mt-2 text-sm leading-7 text-muted-foreground">{description}</p>
             ) : null}
@@ -55,7 +55,9 @@ export function Modal({
             <X className="size-4" />
           </button>
         </div>
-        <div className="mt-6">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-6">
+          {children}
+        </div>
       </div>
     </div>
   );
