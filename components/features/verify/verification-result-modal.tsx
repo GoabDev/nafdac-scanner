@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -118,6 +118,40 @@ export function VerificationResultModal({
 
 function ManualFallbackPanel({ fallbackNumber }: { fallbackNumber: string }) {
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const [showRedirectModal, setShowRedirectModal] = useState(false);
+  const redirectTimeoutRef = useRef<number | null>(null);
+  const countdownIntervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current !== null) {
+        window.clearTimeout(redirectTimeoutRef.current);
+      }
+
+      if (countdownIntervalRef.current !== null) {
+        window.clearInterval(countdownIntervalRef.current);
+      }
+    };
+  }, []);
+
+  function clearPendingRedirect() {
+    if (redirectTimeoutRef.current !== null) {
+      window.clearTimeout(redirectTimeoutRef.current);
+      redirectTimeoutRef.current = null;
+    }
+
+    if (countdownIntervalRef.current !== null) {
+      window.clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+  }
+
+  function cancelRedirect() {
+    clearPendingRedirect();
+    setRedirectCountdown(null);
+    setShowRedirectModal(false);
+  }
 
   async function handleCopyFallbackNumber() {
     try {
@@ -128,8 +162,44 @@ function ManualFallbackPanel({ fallbackNumber }: { fallbackNumber: string }) {
     }
   }
 
-  function handleOpenOfficialPortal() {
-    window.open(OFFICIAL_REGISTRATION_PORTAL, "_blank", "noopener,noreferrer");
+  async function handleOpenOfficialPortal() {
+    cancelRedirect();
+
+    try {
+      await navigator.clipboard.writeText(fallbackNumber);
+      setCopyFeedback(
+        "Number copied. You can paste it into the official portal.",
+      );
+    } catch {
+      setCopyFeedback("Copy failed. The official portal will still open in 5 seconds.");
+    }
+
+    setRedirectCountdown(5);
+    setShowRedirectModal(true);
+
+    countdownIntervalRef.current = window.setInterval(() => {
+      setRedirectCountdown((current) => {
+        if (current === null || current <= 1) {
+          if (countdownIntervalRef.current !== null) {
+            window.clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+
+          return null;
+        }
+
+        return current - 1;
+      });
+    }, 1000);
+
+    redirectTimeoutRef.current = window.setTimeout(() => {
+      window.location.assign(OFFICIAL_REGISTRATION_PORTAL);
+    }, 5000);
+  }
+
+  function handleRedirectNow() {
+    cancelRedirect();
+    window.location.assign(OFFICIAL_REGISTRATION_PORTAL);
   }
 
   return (
@@ -141,8 +211,9 @@ function ManualFallbackPanel({ fallbackNumber }: { fallbackNumber: string }) {
         <h3 className="text-xl font-semibold">Continue on the official portal</h3>
         <p className="text-sm leading-7 text-muted-foreground">
           The official NAFDAC registration portal requires a CAPTCHA, so we cannot
-          submit the fallback automatically from this app. Copy the number below,
-          open the portal, paste it, then click Verify.
+          submit the fallback automatically from this app or paste into their form
+          for you. We will copy the number for you, show a short notice, then open
+          the portal so you only need to paste it there and click Verify.
         </p>
       </div>
 
@@ -154,19 +225,57 @@ function ManualFallbackPanel({ fallbackNumber }: { fallbackNumber: string }) {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
-        <Button type="button" variant="secondary" onClick={handleCopyFallbackNumber}>
-          <Copy className="size-4" />
-          Copy number
-        </Button>
         <Button type="button" onClick={handleOpenOfficialPortal}>
           <ExternalLink className="size-4" />
           Open official portal
+        </Button>
+        <Button type="button" variant="secondary" onClick={handleCopyFallbackNumber}>
+          <Copy className="size-4" />
+          Copy number
         </Button>
       </div>
 
       {copyFeedback ? (
         <p className="mt-3 text-sm text-muted-foreground">{copyFeedback}</p>
       ) : null}
+
+      {redirectCountdown !== null ? (
+        <p className="mt-2 text-sm font-medium text-primary">
+          Opening the official portal in {redirectCountdown}s...
+        </p>
+      ) : null}
+
+      <Modal
+        open={showRedirectModal}
+        onClose={cancelRedirect}
+        title="Number copied"
+        description="Paste the copied NAFDAC number into the official portal when it opens."
+        className="max-w-lg"
+      >
+        <div className="space-y-5 text-center">
+          <div className="rounded-[24px] bg-muted px-4 py-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Redirecting In
+            </p>
+            <p className="mt-2 text-5xl font-semibold text-primary">
+              {redirectCountdown ?? 0}
+            </p>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              The NAFDAC number has been copied. When the official site opens,
+              tap the input field and paste the number.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button type="button" onClick={handleRedirectNow}>
+              Go now
+            </Button>
+            <Button type="button" variant="secondary" onClick={cancelRedirect}>
+              Stay here
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
